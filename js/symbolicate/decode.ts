@@ -1,8 +1,6 @@
-import { decodeBase64Url } from "jsr:@std/encoding/base64url";
-import { decodeVarint, decodeVarint32 } from "jsr:@std/encoding/varint";
+import { decodeBase64Url } from "@std/encoding/base64url";
+import { decodeVarint, decodeVarint32 } from "@std/encoding/varint";
 import type { Header, StackTrace, Version } from "./stacktrace.ts";
-
-// function decode
 
 function decodeEnumString(
   buf: Uint8Array,
@@ -24,7 +22,8 @@ function decodeVersion(buf: Uint8Array, i: number): [Version, number] {
   let major: number,
     minor: number,
     patch: number,
-    canaryHash: string | undefined;
+    canaryHash: string | undefined,
+    devBuild: boolean;
   [major, i] = decodeVarint32(buf, i);
   [minor, i] = decodeVarint32(buf, i);
   [patch, i] = decodeVarint32(buf, i);
@@ -36,12 +35,20 @@ function decodeVersion(buf: Uint8Array, i: number): [Version, number] {
     i += discrim;
     canaryHash = new TextDecoder().decode(bytes);
   }
+  [devBuild, i] = decodeBool(buf, i);
+
   return [{
     major,
     minor,
     patch,
-    canaryHash,
+    devBuild,
+    ...(canaryHash ? { canaryHash } : {}),
   }, i];
+}
+
+function decodeBool(buf: Uint8Array, i: number): [boolean, number] {
+  const value = buf[i++];
+  return [value === 1, i];
 }
 
 function decodeHeader(buf: Uint8Array, i: number): [Header, number] {
@@ -52,11 +59,11 @@ function decodeHeader(buf: Uint8Array, i: number): [Header, number] {
     1: "macos",
     2: "windows",
   });
-  [header.version, i] = decodeVersion(buf, i);
   [header.arch, i] = decodeEnumString(buf, i, {
-    0: "x64_64",
+    0: "x86_64",
     1: "aarch64",
   });
+  [header.version, i] = decodeVersion(buf, i);
   return [header as Header, i];
 }
 

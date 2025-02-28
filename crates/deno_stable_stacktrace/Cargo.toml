@@ -5,6 +5,7 @@ edition.workspace = true
 
 [dependencies]
 backtrace = { version = "0.3.74", optional = true }
+serde = { workspace = true, optional = true, features = ["derive"] }
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.59", features = [
@@ -18,3 +19,4 @@ libc = { version = "0.2.168", optional = true }
 default = ["stacktrace", "encode"]
 stacktrace = ["dep:backtrace", "dep:libc", "dep:windows-sys"]
 encode = []
+serde = ["dep:serde"]

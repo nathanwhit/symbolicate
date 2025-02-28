@@ -58,7 +58,9 @@ fn base64url_encode(input: &[u8]) -> String {
 
   result
 }
-#[derive(Debug)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(from = "String", into = "String"))]
 pub enum Os {
   Linux,
   Mac,
@@ -66,27 +68,51 @@ pub enum Os {
   Other(OtherString<3>),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct Version {
   pub major: u64,
   pub minor: u64,
   pub patch: u64,
+  #[cfg_attr(
+    feature = "serde",
+    serde(skip_serializing_if = "canary_hash_is_none", default)
+  )]
   pub canary_hash: CanaryHash,
   pub dev_build: bool,
 }
 
-#[derive(Debug, Default)]
+fn canary_hash_is_none(canary_hash: &CanaryHash) -> bool {
+  canary_hash.0.is_none()
+}
+
+#[derive(Debug, Default, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(
+  feature = "serde",
+  serde(default, from = "Option<String>", into = "Option<String>")
+)]
 pub struct CanaryHash(Option<OtherString<1>>);
 
 impl CanaryHash {
   pub fn new(s: String) -> Self {
     Self(Some(s.into()))
   }
+  pub fn none() -> Self {
+    Self(None)
+  }
 }
 
 impl<S: AsRef<str>> From<Option<S>> for CanaryHash {
   fn from(value: Option<S>) -> Self {
     Self(value.map(|s| s.as_ref().to_string().into()))
+  }
+}
+
+impl Into<Option<String>> for CanaryHash {
+  fn into(self) -> Option<String> {
+    self.0.map(|s| s.value)
   }
 }
 
@@ -109,8 +135,9 @@ impl Encode for CanaryHash {
   }
 }
 
-#[derive(Debug)]
-
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct Header {
   trace_version: u8,
   os: Os,
@@ -118,7 +145,9 @@ pub struct Header {
   arch: Arch,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(from = "String", into = "String"))]
 pub enum Arch {
   X86_64,
   Aarch64,
@@ -148,7 +177,49 @@ impl Encode for Arch {
   }
 }
 
-#[derive(Debug)]
+impl<S: AsRef<str>> From<S> for Arch {
+  fn from(value: S) -> Self {
+    match value.as_ref() {
+      "x86_64" => Arch::X86_64,
+      "aarch64" => Arch::Aarch64,
+      other => Arch::Other(other.to_string().into()),
+    }
+  }
+}
+
+impl<S: AsRef<str>> From<S> for Os {
+  fn from(value: S) -> Self {
+    match value.as_ref() {
+      "linux" => Os::Linux,
+      "macos" => Os::Mac,
+      "windows" => Os::Windows,
+      other => Os::Other(other.to_string().into()),
+    }
+  }
+}
+
+impl Into<String> for Arch {
+  fn into(self) -> String {
+    match self {
+      Arch::X86_64 => "x86_64".to_string(),
+      Arch::Aarch64 => "aarch64".to_string(),
+      Arch::Other(other_string) => other_string.value,
+    }
+  }
+}
+
+impl Into<String> for Os {
+  fn into(self) -> String {
+    match self {
+      Os::Linux => "linux".to_string(),
+      Os::Mac => "macos".to_string(),
+      Os::Windows => "windows".to_string(),
+      Os::Other(other_string) => other_string.value,
+    }
+  }
+}
+
+#[derive(Debug, Clone)]
 pub struct OtherString<const MIN: usize> {
   value: String,
 }
@@ -266,16 +337,16 @@ impl Encode for Header {
   fn encoded_size(&self) -> usize {
     (self.trace_version.encoded_size())
       + (self.os.encoded_size())
-      + (self.version.encoded_size())
       + (self.arch.encoded_size())
+      + (self.version.encoded_size())
   }
 
   fn encode_into(&self, buf: &mut [u8]) -> usize {
     let mut i = 0;
     i += self.trace_version.encode_into(&mut buf[i..]);
     i += self.os.encode_into(&mut buf[i..]);
-    i += self.version.encode_into(&mut buf[i..]);
     i += self.arch.encode_into(&mut buf[i..]);
+    i += self.version.encode_into(&mut buf[i..]);
     i
   }
 }
@@ -290,7 +361,9 @@ impl Encode for u8 {
   }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct StackTrace {
   header: Header,
   addrs: Addrs,
@@ -335,7 +408,12 @@ impl StackTrace {
   }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(
+  feature = "serde",
+  serde(rename_all = "camelCase", from = "Vec<u64>", into = "Vec<u64>")
+)]
 struct Addrs(Vec<u64>);
 impl Encode for Addrs {
   fn encoded_size(&self) -> usize {
@@ -351,6 +429,18 @@ impl Encode for Addrs {
   }
 }
 
+impl From<Vec<u64>> for Addrs {
+  fn from(value: Vec<u64>) -> Self {
+    Self(value)
+  }
+}
+
+impl From<Addrs> for Vec<u64> {
+  fn from(value: Addrs) -> Self {
+    value.0
+  }
+}
+
 impl Encode for StackTrace {
   fn encoded_size(&self) -> usize {
     self.header.encoded_size() + self.addrs.encoded_size()
@@ -361,5 +451,43 @@ impl Encode for StackTrace {
     i += self.header.encode_into(&mut buf[i..]);
     i += self.addrs.encode_into(&mut buf[i..]);
     i
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn encode() {
+    let stack_trace = StackTrace::new(
+      vec![1, 2, 3],
+      "aarch64",
+      "windows",
+      Version {
+        major: 4,
+        minor: 5,
+        patch: 6,
+        canary_hash: CanaryHash::none(),
+        dev_build: true,
+      },
+    );
+    let encoded = stack_trace.encode();
+    assert_eq!(
+      encoded,
+      vec![
+        0, // trace version 0
+        2, // os windows
+        1, // arch aarch64
+        4, // major 4
+        5, // minor 5
+        6, // patch 6
+        0, // canary hash none
+        1, // dev build true
+        1, // addr 1
+        2, // addr 2
+        3, // addr 3
+      ]
+    )
   }
 }

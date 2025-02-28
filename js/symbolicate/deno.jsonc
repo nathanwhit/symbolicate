@@ -8,6 +8,7 @@
     "./decode": "./decode.ts"
   },
   "imports": {
-    "symbolicate_wasm": "./lib/deno_symbolicate_wasm.js"
+    "symbolicate_wasm": "./lib/deno_symbolicate_wasm.js",
+    "stacktrace_wasm": "./lib/deno_stacktrace_encoding_wasm.js"
   }
 }

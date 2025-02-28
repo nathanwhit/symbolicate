@@ -24,6 +24,7 @@ export interface Version {
   minor: number;
   patch: number;
   canaryHash?: string;
+  devBuild: boolean;
 }
 export interface Header {
   traceVersion: number;
