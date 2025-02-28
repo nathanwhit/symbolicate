@@ -1,17 +1,29 @@
 import {
   debugInfoToSymcache,
-  type EncodedSymCache,
   Symbolicator,
 } from "@nathanwhit/deno-symbolicate";
-import {
+import type {
   Header,
-  StackTrace,
   SymbolicatedStackTrace,
 } from "@nathanwhit/deno-symbolicate/stacktrace";
 import { decodeStackTraceString } from "@nathanwhit/deno-symbolicate/decode";
 import { FileStorage } from "./storage.ts";
 
+function getElementById(id: string): HTMLElement {
+  const element = document.getElementById(id);
+  if (!element) {
+    throw new Error(`Element with id ${id} not found`);
+  }
+  return element;
+}
+
 const symcacheStorage = await FileStorage.open("symcaches");
+
+const debugInfoButton = getElementById("debug-info-button");
+const debugInfoFile = getElementById("debug-info-file");
+
+debugInfoFile.onchange = 
+debugInfoButton.onclick = () => 
 
 async function processStackTrace(): Promise<void> {
   const input = document.getElementById("input") as HTMLTextAreaElement;
@@ -60,15 +72,27 @@ async function fetchDebugInfo(header: Header) {
 // Mock function to simulate processing - replace this with actual implementation
 async function mockProcessStackTrace(
   encodedTrace: string,
+  providedDebugInfo?: Uint8Array | null,
 ): Promise<SymbolicatedStackTrace> {
   const stack = decodeStackTraceString(encodedTrace);
   const key = storageKey(stack.header);
   let symcacheBlob = await symcacheStorage.getFile(key);
+
   if (!symcacheBlob) {
-    const debugInfo = await fetchDebugInfo(stack.header);
+    let debugInfo: Uint8Array;
+
+    if (providedDebugInfo) {
+      // Use the provided debug info file
+      debugInfo = providedDebugInfo;
+    } else {
+      // Try to fetch debug info automatically
+      debugInfo = await fetchDebugInfo(stack.header);
+    }
+
     symcacheBlob = new Blob([debugInfoToSymcache(debugInfo)]);
     await symcacheStorage.addFile(key, symcacheBlob);
   }
+
   const symbolicator = new Symbolicator(await symcacheBlob.bytes());
   return symbolicator.symbolicate(stack);
 }

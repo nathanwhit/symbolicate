@@ -1,7 +1,7 @@
 {
   "workspace": ["./js/client-side", "./js/symbolicate"],
   "tasks": {
-    "wasmbuild": "deno run -A jsr:@deno/wasmbuild -p deno_symbolicate_wasm --out js/symbolicate/lib",
+    "wasmbuild": "deno run -A jsr:@deno/wasmbuild -p deno_symbolicate_wasm --out js/symbolicate/lib --inline",
     "wasmbuild-stacktrace": "deno run -A jsr:@deno/wasmbuild -p deno_stacktrace_encoding_wasm --out js/symbolicate/lib",
     "wasmbuildst": {
       "dependencies": ["wasmbuild-stacktrace"]

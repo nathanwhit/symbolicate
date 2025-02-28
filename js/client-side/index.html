@@ -107,9 +107,19 @@
           placeholder="Paste your encoded stack trace here..."
         ></textarea>
       </div>
+      <div>
+        <label>
+          <span>Debug Info</span>
+          <button id="debug-info-button">Open</button>
+          <input type="file" id="debug-info-file" accept=".zip" hidden/>
+        </label>
+      </div>
       <button id="process-btn">Process Stack Trace</button>
       <div id="output"></div>
+
+      <ul id="file-list"></ul>
     </div>
+
 
     <script type="module">
       import { processStackTrace } from "./src/stacktrace.ts";

@@ -83,6 +83,7 @@ pub struct Version {
   pub dev_build: bool,
 }
 
+#[cfg(feature = "serde")]
 fn canary_hash_is_none(canary_hash: &CanaryHash) -> bool {
   canary_hash.0.is_none()
 }

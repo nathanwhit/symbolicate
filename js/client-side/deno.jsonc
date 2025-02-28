@@ -10,6 +10,7 @@
   },
   "imports": {
     "@deno/vite-plugin": "npm:@deno/vite-plugin@^1.0.4",
+    "@zip-js/zip-js": "jsr:@zip-js/zip-js@^2.7.57",
     "vite": "npm:vite@^6.2.0"
   },
   "tasks": {
