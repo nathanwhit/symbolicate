@@ -1,0 +1,4 @@
+/target
+js/symbolicate/lib/
+.vite
+.vscode
