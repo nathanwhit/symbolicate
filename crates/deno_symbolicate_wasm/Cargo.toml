@@ -1,0 +1,19 @@
+[package]
+name = "deno_symbolicate_wasm"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+wasm-bindgen = "=0.2.100"
+web-sys = { version = "0.3.77", features = ["console"] }
+serde = { version = "1.0.217", features = ["derive"] }
+serde-wasm-bindgen = "0.6.5"
+deno_symbolicate = { path = "../deno_symbolicate" }
+
+[lib]
+crate-type = ["cdylib"]
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = [
+  'cfg(wasm_bindgen_unstable_test_coverage)',
+] }

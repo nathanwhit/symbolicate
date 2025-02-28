@@ -1,0 +1,13 @@
+{
+  "name": "@nathanwhit/deno-symbolicate",
+  "version": "0.1.0",
+  "exports": {
+    ".": "./mod.ts",
+    "./deno": "./deno.ts",
+    "./stacktrace": "./stacktrace.ts",
+    "./decode": "./decode.ts"
+  },
+  "imports": {
+    "symbolicate_wasm": "./lib/deno_symbolicate_wasm.js"
+  }
+}

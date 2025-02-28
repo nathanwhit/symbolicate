@@ -1,0 +1,20 @@
+[package]
+name = "deno_stable_stacktrace"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+backtrace = { version = "0.3.74", optional = true }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = [
+  "Win32_System_LibraryLoader",
+], optional = true }
+
+[target.'cfg(unix)'.dependencies]
+libc = { version = "0.2.168", optional = true }
+
+[features]
+default = ["stacktrace", "encode"]
+stacktrace = ["dep:backtrace", "dep:libc", "dep:windows-sys"]
+encode = []

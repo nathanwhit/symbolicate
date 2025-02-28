@@ -1,0 +1,6 @@
+{
+  "workspace": ["./js/client-side", "./js/symbolicate"],
+  "tasks": {
+    "wasmbuild": "deno run -A jsr:@deno/wasmbuild --out js/symbolicate/lib"
+  }
+}

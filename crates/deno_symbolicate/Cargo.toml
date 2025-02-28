@@ -1,0 +1,15 @@
+[package]
+name = "deno_symbolicate"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+anyhow = "1.0.95"
+clap = { version = "4.5.27", features = ["derive"] }
+symbolic = { version = "12.13.3", features = ["debuginfo", "symcache"] }
+symbolic-demangle = { version = "12.13.3", features = [
+  "rust",
+], default-features = false }
+thiserror = "2.0.11"
+serde = { version = "1.0.217", features = ["derive"] }
+yoke = { version = "0.7.5" }

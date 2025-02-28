@@ -1,0 +1,19 @@
+{
+  "name": "@nathanwhit/symbolicate-clientside",
+  "version": "0.1.0",
+  "exports": "./src/stacktrace.ts",
+  "compilerOptions": {
+    "lib": [
+      "deno.window",
+      "dom"
+    ]
+  },
+  "imports": {
+    "@deno/vite-plugin": "npm:@deno/vite-plugin@^1.0.4",
+    "vite": "npm:vite@^6.2.0",
+    "vite-plugin-wasm": "npm:vite-plugin-wasm@^3.4.1"
+  },
+  "tasks": {
+    "dev": "deno run -A npm:vite"
+  }
+}
