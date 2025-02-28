@@ -47,11 +47,12 @@ mod stacktrace {
         let segment_start = unsafe { (*data).vmaddr };
         let segment_end = segment_start + unsafe { (*data).vmsize };
 
-        if addr_stable >= segment_start && addr_stable < segment_end {
-          if main_image == 0 {
-            let relative = addr_stable - segment_start;
-            return Some(relative);
-          }
+        if main_image == 0
+          && addr_stable >= segment_start
+          && addr_stable < segment_end
+        {
+          let relative = addr_stable - segment_start;
+          return Some(relative);
         }
       }
 

@@ -110,9 +110,9 @@ impl<S: AsRef<str>> From<Option<S>> for CanaryHash {
   }
 }
 
-impl Into<Option<String>> for CanaryHash {
-  fn into(self) -> Option<String> {
-    self.0.map(|s| s.value)
+impl From<CanaryHash> for Option<String> {
+  fn from(value: CanaryHash) -> Self {
+    value.0.map(|s| s.value)
   }
 }
 
@@ -198,9 +198,9 @@ impl<S: AsRef<str>> From<S> for Os {
   }
 }
 
-impl Into<String> for Arch {
-  fn into(self) -> String {
-    match self {
+impl From<Arch> for String {
+  fn from(value: Arch) -> Self {
+    match value {
       Arch::X86_64 => "x86_64".to_string(),
       Arch::Aarch64 => "aarch64".to_string(),
       Arch::Other(other_string) => other_string.value,
@@ -208,9 +208,9 @@ impl Into<String> for Arch {
   }
 }
 
-impl Into<String> for Os {
-  fn into(self) -> String {
-    match self {
+impl From<Os> for String {
+  fn from(value: Os) -> Self {
+    match value {
       Os::Linux => "linux".to_string(),
       Os::Mac => "macos".to_string(),
       Os::Windows => "windows".to_string(),

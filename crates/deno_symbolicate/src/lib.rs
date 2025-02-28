@@ -103,7 +103,8 @@ impl OwnedSymCache {
     })?))
   }
 
-  pub fn as_ref<'a>(&'a self) -> &'a SymCache<'a> {
+  #[expect(clippy::should_implement_trait)]
+  pub fn as_ref(&self) -> &SymCache<'_> {
     &self.0.get().0
   }
 }
