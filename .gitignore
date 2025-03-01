@@ -3,3 +3,4 @@ js/symbolicate/lib/
 .vite
 .vscode
 node_modules
+dist
