@@ -7,6 +7,10 @@ import type {
   SymbolicatedStackTrace,
 } from "./stacktrace.ts";
 
+export * from "./decode.ts";
+
+export type * from "./stacktrace.ts";
+
 export type EncodedSymCache = Uint8Array;
 
 export class Symbolicator {

@@ -6,11 +6,15 @@
     "lib": [
       "deno.window",
       "dom"
-    ]
+    ],
+    "jsxImportSource": "preact",
+    "jsx": "react-jsx"
   },
   "imports": {
     "@deno/vite-plugin": "npm:@deno/vite-plugin@^1.0.4",
+    "@preact/preset-vite": "npm:@preact/preset-vite@^2.10.1",
     "@zip-js/zip-js": "jsr:@zip-js/zip-js@^2.7.57",
+    "preact": "npm:preact@^10.26.4",
     "vite": "npm:vite@^6.2.0"
   },
   "tasks": {
