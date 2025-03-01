@@ -13,8 +13,10 @@
   "imports": {
     "@deno/vite-plugin": "npm:@deno/vite-plugin@^1.0.4",
     "@preact/preset-vite": "npm:@preact/preset-vite@^2.10.1",
+    "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.0.9",
     "@zip-js/zip-js": "jsr:@zip-js/zip-js@^2.7.57",
     "preact": "npm:preact@^10.26.4",
+    "tailwindcss": "npm:tailwindcss@^4.0.9",
     "vite": "npm:vite@^6.2.0"
   },
   "tasks": {

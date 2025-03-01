@@ -12,5 +12,5 @@
     "@std/encoding": "jsr:@std/encoding@^1.0.7",
     "@std/fs": "jsr:@std/fs@^1.0.13"
   },
-  "nodeModulesDir": "manual"
+  "nodeModulesDir": "auto"
 }
