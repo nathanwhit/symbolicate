@@ -4,6 +4,7 @@ import preact from "@preact/preset-vite";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
+  // @ts-ignore deno bug
   plugins: [deno(), preact(), tailwindcss()],
   server: {
     port: 3000,
