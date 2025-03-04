@@ -7,7 +7,9 @@ import {
 } from "@nathanwhit/deno-symbolicate";
 import { writeSymbolCacheFromDebugFile } from "@nathanwhit/deno-symbolicate/deno";
 
+// deno-lint-ignore no-explicit-any
 function toJSON(stack: SymbolicatedStackTrace): Record<string, any> {
+  // deno-lint-ignore no-explicit-any
   const out: Record<string, any> = {};
   out.header = stack.header;
   out.frames = stack.frames.map((frame) => {
@@ -49,12 +51,15 @@ function getSymbolicator(
   }
 }
 
+function getDebugInfo(_header: Header): string {
+  throw new Error("todo");
+}
+
 Deno.serve(async (request) => {
   const encodedStackTrace = await request.text();
   const decoded = decodeStackTraceString(encodedStackTrace);
-  const debugInfo =
-    "/Users/nathanwhit/Documents/Code/Playgrounds/reconstruct-stacktrace/target/x86_64-pc-windows-msvc/release/reconstruct_stacktrace.pdb";
-  const symcache = "./reconstruct-stacktrace-windows.symcache";
+  const debugInfo = getDebugInfo(decoded.header);
+  const symcache = "./debug-info.symcache";
   const symbolicator = getSymbolicator(decoded.header, debugInfo, symcache);
   const symbolicated = symbolicator.symbolicate(decoded);
   const response = Response.json(toJSON(symbolicated));
