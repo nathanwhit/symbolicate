@@ -12,4 +12,4 @@ symbolic-demangle = { version = "12.13.3", features = [
 ], default-features = false }
 thiserror = "2.0.11"
 serde = { version = "1.0.217", features = ["derive"] }
-yoke = { version = "0.7.5" }
+yoke = { version = "0.7.5", features = ["derive"] }

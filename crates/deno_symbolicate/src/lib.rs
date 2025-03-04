@@ -7,6 +7,11 @@ use symbolic::{
 };
 use symbolic_demangle::{Demangle, DemangleOptions};
 
+/// Creates an encoded `SymCache` from the contents of the debug info.
+///
+/// The encoded symcache can then be consumed through the `OwnedSymcache::parse`
+/// method, to get a lifetime-less value, or through `parse_symcache` for a borrowed
+/// version.
 pub fn create_symcache(debug_file: &[u8]) -> Result<Vec<u8>, anyhow::Error> {
   let byteview = ByteView::from_slice(debug_file);
   let fat_obj = Archive::parse(&byteview)?;
@@ -24,6 +29,12 @@ pub fn create_symcache(debug_file: &[u8]) -> Result<Vec<u8>, anyhow::Error> {
   Ok(result)
 }
 
+pub fn parse_symcache(
+  symcache: &[u8],
+) -> Result<symbolic::symcache::SymCache<'_>, symbolic::symcache::Error> {
+  SymCache::parse(symcache)
+}
+
 #[derive(serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FrameLocation {
@@ -36,8 +47,9 @@ pub struct FrameLocation {
 
 pub fn symbolicate_addrs(
   addrs: &[u64],
-  symcache: &SymCache,
+  symcache: impl AsSymcache,
 ) -> Result<Vec<Vec<FrameLocation>>, anyhow::Error> {
+  let symcache = symcache.as_symcache();
   let mut out = Vec::new();
   for &addr in addrs {
     let syms = symcache.lookup(addr).collect::<Vec<_>>();
@@ -67,29 +79,34 @@ pub fn symbolicate_addrs(
 
 use yoke::Yoke;
 
+#[derive(yoke::Yokeable)]
 struct SymCacheWrapper<'a>(SymCache<'a>);
 
-unsafe impl<'a> yoke::Yokeable<'a> for SymCacheWrapper<'static> {
-  type Output = SymCacheWrapper<'a>;
+pub trait AsSymcache {
+  fn as_symcache(&self) -> &SymCache<'_>;
+}
 
-  fn transform(&'a self) -> &'a Self::Output {
+impl AsSymcache for OwnedSymCache {
+  fn as_symcache(&self) -> &SymCache<'_> {
+    self.as_ref()
+  }
+}
+
+impl AsSymcache for &'_ OwnedSymCache {
+  fn as_symcache(&self) -> &SymCache<'_> {
+    self.as_ref()
+  }
+}
+
+impl AsSymcache for SymCache<'_> {
+  fn as_symcache(&self) -> &SymCache<'_> {
     self
   }
+}
 
-  fn transform_owned(self) -> Self::Output {
+impl AsSymcache for &'_ SymCache<'_> {
+  fn as_symcache(&self) -> &SymCache<'_> {
     self
-  }
-
-  unsafe fn make(from: Self::Output) -> Self {
-    unsafe { std::mem::transmute(from) }
-  }
-
-  fn transform_mut<F>(&'a mut self, f: F)
-  where
-    // be VERY CAREFUL changing this signature, it is very nuanced (see above)
-    F: 'static + for<'b> FnOnce(&'b mut Self::Output),
-  {
-    unsafe { f(std::mem::transmute::<&mut Self, &mut Self::Output>(self)) }
   }
 }
 
