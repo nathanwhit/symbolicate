@@ -1,11 +1,11 @@
 import { existsSync } from "jsr:@std/fs/exists";
 import {
-  createSymbolCache,
   decodeStackTraceString,
   Header,
   SymbolicatedStackTrace,
   Symbolicator,
-} from "../js/client-side/mod.ts";
+} from "@nathanwhit/deno-symbolicate";
+import { writeSymbolCacheFromDebugFile } from "@nathanwhit/deno-symbolicate/deno";
 
 function toJSON(stack: SymbolicatedStackTrace): Record<string, any> {
   const out: Record<string, any> = {};
@@ -37,7 +37,7 @@ function getSymbolicator(
     return cache.get(key)!;
   } else {
     if (!existsSync(symcache)) {
-      createSymbolCache(
+      writeSymbolCacheFromDebugFile(
         debugInfo,
         symcache,
       );
