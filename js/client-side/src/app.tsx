@@ -230,6 +230,7 @@ export function App() {
             </p>
           </div>
           <button
+            type = "button"
             onClick={toggleDarkMode}
             className="p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             aria-label="Toggle dark mode"
